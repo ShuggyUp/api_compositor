@@ -1,15 +1,23 @@
 import json
 import httpx
 from schemas import ApiCompositorResponse, ApiCompositorRequest
-from config import services_settings
+from config import server_settings
 
 
 def calculate_vlp(input_data: ApiCompositorRequest):
     with httpx.Client() as client:
         vlp_params = {
-            "inclinometry": input_data.inclinometry,
-            "casing": input_data.casing,
-            "tubing": input_data.tubing,
+            "inclinometry": {
+                "MD": input_data.inclinometry.MD,
+                "TVD": input_data.inclinometry.TVD,
+            },
+            "casing": {
+                "d": input_data.casing.d,
+            },
+            "tubing": {
+                "d": input_data.tubing.d,
+                "h_mes": input_data.tubing.h_mes,
+            },
             "pvt": {
                 "wct": input_data.pvt.wct,
                 "rp": input_data.pvt.rp,
@@ -23,7 +31,7 @@ def calculate_vlp(input_data: ApiCompositorRequest):
             "h_res": input_data.h_res,
         }
         resp = client.post(
-            f"http://{services_settings.vlp_service_host}:{services_settings.vlp_service_port}/vlp/calculator",
+            f"http://{server_settings.vlp_service_host}:{server_settings.vlp_service_port}/vlp/calculator",
             json=vlp_params,
         )
         resp = json.loads(resp.text)
@@ -39,7 +47,7 @@ def calculate_ipr(input_data: ApiCompositorRequest):
             "pb": input_data.pvt.pb,
         }
         resp = client.post(
-            f"http://{services_settings.ipr_service_host}:{services_settings.ipr_service_port}/ipr/calc",
+            f"http://{server_settings.ipr_service_host}:{server_settings.ipr_service_port}/ipr/calc",
             json=ipr_params,
         )
         resp = json.loads(resp.text)
@@ -56,7 +64,7 @@ def calculate_intersection_vlp_with_ipr(input_data: ApiCompositorRequest):
             "ipr": ipr_nodes,
         }
         resp = client.post(
-            f"http://{services_settings.ipr_service_host}:{services_settings.ipr_service_port}/nodal_analysis",
+            f"http://{server_settings.nodal_analysis_host}:{server_settings.nodal_analysis_port}/nodal_analysis",
             json=nodal_analysis_params,
         )
         resp = json.loads(resp.text)

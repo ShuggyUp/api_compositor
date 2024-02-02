@@ -2,22 +2,13 @@ from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class UvicornSettings(BaseSettings):
+class ServersSettings(BaseSettings):
     """
     Настройки сервера
     """
 
     host: str = Field(default="localhost")
     port: int = Field(default=8000)
-
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="UTF-8")
-
-
-class ServicesSettings(BaseSettings):
-    """
-    Настройки для доступа к другим сервисам
-    """
-
     vlp_service_host: str = Field(default="localhost")
     vlp_service_port: int = Field(default=8001)
     ipr_service_host: str = Field(default="localhost")
@@ -28,5 +19,4 @@ class ServicesSettings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="UTF-8")
 
 
-server_settings = UvicornSettings()
-services_settings = ServicesSettings()
+server_settings = ServersSettings()
