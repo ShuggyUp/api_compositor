@@ -1,5 +1,5 @@
 from typing import List
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class Inclinometry(BaseModel):
@@ -7,8 +7,15 @@ class Inclinometry(BaseModel):
     Схема для валидации данных инклинометрии
     """
 
-    MD: List[float] = Field(title="Измеренная по стволу глубина, м", ge=0)
-    TVD: List[float] = Field(title="Вертикальная глубина, м", ge=0)
+    MD: List[float] = Field(title="Измеренная по стволу глубина, м")
+    TVD: List[float] = Field(title="Вертикальная глубина, м")
+
+    @field_validator("MD", "TVD")
+    def check_positive_numbers(cls, v, values, **kwargs):
+        for node in v:
+            if node < 0:
+                raise ValueError("Числа должны быть больше 0")
+        return v
 
 
 class Pipeline(BaseModel):
